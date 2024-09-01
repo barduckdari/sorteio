@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteio de Números</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Helvetica, sans-serif;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .config-frame, .sorteio-frame {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            font-size: 24px;
+            margin: 20px;
+            cursor: pointer;
+        }
+        .button.red {
+            background-color: #FF5733;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="config-frame" class="config-frame visible">
+            <h1>Intervalo de números</h1>
+            <div>
+                <label for="inicio">Início:</label>
+                <input type="number" id="inicio">
+            </div>
+            <div>
+                <label for="fim">Fim:</label>
+                <input type="number" id="fim">
+            </div>
+            <div>
+                <input type="checkbox" id="repetir">
+                <label for="repetir">Permitir repetição</label>
+            </div>
+            <button class="button" onclick="configurarSorteio()">Iniciar Sorteio</button>
+        </div>
+        <div id="sorteio-frame" class="sorteio-frame">
+            <h1 id="intervalo-sorteio-label"></h1>
+            <h1 id="result-label" style="font-size: 200px;"></h1>
+            <div>
+                <button class="button" onclick="sortear()">Sortear</button>
+                <button class="button red" onclick="reiniciarSorteio()">Reiniciar Sorteio</button>
+                <button class="button red" onclick="voltarConfig()">Voltar</button>
+            </div>
+            <div>
+                <h2>Histórico de Números Sorteados:</h2>
+                <p id="historico-text"></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        let numerosSorteados = new Set();
+
+        function configurarSorteio() {
+            document.getElementById('config-frame').classList.remove('visible');
+            document.getElementById('sorteio-frame').classList.add('visible');
+            const minNum = document.getElementById('inicio').value;
+            const maxNum = document.getElementById('fim').value;
+            document.getElementById('intervalo-sorteio-label').innerText = `Sorteando números de ${minNum} a ${maxNum}`;
+        }
+
+        function sortear() {
+            const repetir = document.getElementById('repetir').checked;
+            const minNum = parseInt(document.getElementById('inicio').value);
+            const maxNum = parseInt(document.getElementById('fim').value);
+            let numero = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+
+            if (!repetir) {
+                while (numerosSorteados.has(numero)) {
+                    numero = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+                }
+                numerosSorteados.add(numero);
+            }
+
+            animarSorteio(numero, minNum, maxNum);
+            atualizarHistorico(numero);
+        }
+
+        function animarSorteio(numeroFinal, minNum, maxNum) {
+            const resultLabel = document.getElementById('result-label');
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    resultLabel.innerText = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+                }, i * 100);
+            }
+            setTimeout(() => {
+                resultLabel.innerText = numeroFinal;
+            }, 1000);
+        }
+
+        function atualizarHistorico(numero) {
+            const historicoText = document.getElementById('historico-text');
+            historicoText.innerText += ` ${numero}`;
+        }
+
+        function reiniciarSorteio() {
+            numerosSorteados.clear();
+            document.getElementById('historico-text').innerText = '';
+            document.getElementById('result-label').innerText = '';
+        }
+
+        function voltarConfig() {
+            document.getElementById('sorteio-frame').classList.remove('visible');
+            document.getElementById('config-frame').classList.add('visible');
+        }
+    </script>
+</body>
+</html>
